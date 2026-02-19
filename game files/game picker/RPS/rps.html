@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rock Paper Scissors</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+*{ box-sizing:border-box }
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  font-family:Segoe UI, system-ui, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color:#e5e7eb;
+}
+
+h1{ margin-bottom:12px; }
+
+#arena{
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  padding:26px 30px;
+  border-radius:18px;
+
+  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+  text-align:center;
+}
+
+.choices{
+  display:flex;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+button{
+  padding:14px 22px;
+  font-size:16px;
+  font-weight:700;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+
+  background: rgba(255,255,255,0.12);
+  color:#e5e7eb;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.25),
+    0 6px 16px rgba(0,0,0,0.35);
+
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+button:hover{
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+}
+
+#result{
+  margin-top:14px;
+  font-size:16px;
+}
+
+.win{ color:#22c55e; }
+.lose{ color:#ef4444; }
+.draw{ color:#38bdf8; }
+
+#round{
+  margin-top:8px;
+  font-size:14px;
+  opacity:0.85;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Rock · Paper · Scissors</h1>
+
+<div id="arena">
+  <div class="choices">
+    <button data-choice="Rock">✊ Rock</button>
+    <button data-choice="Paper">✋ Paper</button>
+    <button data-choice="Scissors">✌ Scissors</button>
+  </div>
+
+  <div id="result">Make your move</div>
+  <div id="round"></div>
+</div>
+
+<script>
+const options = ["Rock","Paper","Scissors"];
+
+$('.choices button').click(function(){
+  const user = $(this).data('choice');
+  const ai = options[Math.floor(Math.random()*3)];
+
+  let outcome = '';
+  let cls = '';
+
+  if(user === ai){
+    outcome = "Draw";
+    cls = "draw";
+  }else if(
+    (user==="Rock" && ai==="Scissors") ||
+    (user==="Paper" && ai==="Rock") ||
+    (user==="Scissors" && ai==="Paper")
+  ){
+    outcome = "You Win!";
+    cls = "win";
+  }else{
+    outcome = "You Lose";
+    cls = "lose";
+  }
+
+  $('#result')
+    .removeClass('win lose draw')
+    .addClass(cls)
+    .text(outcome);
+
+  $('#round').text(`You: ${user} · AI: ${ai}`);
+});
+</script>
+
+</body>
+</html>

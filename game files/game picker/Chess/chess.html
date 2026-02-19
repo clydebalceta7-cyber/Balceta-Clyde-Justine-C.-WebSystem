@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Chess</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+body{
+  background:#1a1a2e;
+  color:white;
+  font-family:Segoe UI,sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  margin:0;
+}
+#game{display:flex;gap:20px}
+#board{
+  display:grid;
+  grid-template:repeat(8,70px)/repeat(8,70px);
+  border:4px solid #111;
+}
+.square{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:42px;
+  cursor:pointer;
+}
+.light{background:#f0d9b5}
+.dark{background:#b58863}
+.selected{outline:4px solid yellow}
+.move{box-shadow:inset 0 0 0 4px rgba(0,255,0,.6)}
+
+#side{width:220px}
+#turn{font-size:22px;margin-bottom:10px}
+#history{
+  max-height:300px;
+  overflow:auto;
+  font-size:14px;
+  background:#111;
+  padding:10px;
+}
+
+#promotion{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+.promo-box{background:#222;padding:20px;display:flex;gap:15px}
+.promo{font-size:40px;cursor:pointer}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+  <div id="board"></div>
+  <div id="side">
+    <div id="turn">Turn: White</div>
+    <button id="undo">Undo</button>
+    <h3>Moves</h3>
+    <div id="history"></div>
+  </div>
+</div>
+
+<div id="promotion">
+  <div class="promo-box">
+    <div class="promo" data-p="q">♕</div>
+    <div class="promo" data-p="r">♖</div>
+    <div class="promo" data-p="b">♗</div>
+    <div class="promo" data-p="n">♘</div>
+  </div>
+</div>
+
+<script>
+const P={
+ wp:'♙',wr:'♖',wn:'♘',wb:'♗',wq:'♕',wk:'♔',
+ bp:'♟',br:'♜',bn:'♞',bb:'♝',bq:'♛',bk:'♚'
+};
+
+const sMove=new Audio('move.wav');
+const sCap=new Audio('capture.wav');
+const sCheck=new Audio('check.wav');
+const sCastle=new Audio('castle.wav');
+const sMate=new Audio('checkmate.wav');
+const sStale=new Audio('stalemate.wav');
+
+let board=[
+['br','bn','bb','bq','bk','bb','bn','br'],
+['bp','bp','bp','bp','bp','bp','bp','bp'],
+['','','','','','','',''],
+['','','','','','','',''],
+['','','','','','','',''],
+['','','','','','','',''],
+['wp','wp','wp','wp','wp','wp','wp','wp'],
+['wr','wn','wb','wq','wk','wb','wn','wr']
+];
+
+let turn='w',selected=null,legal=[],history=[],promoPos=null;
+let moved={wk:false,wr0:false,wr7:false,bk:false,br0:false,br7:false};
+let enPassant=null;
+
+const clone=b=>b.map(r=>r.slice());
+const inB=(r,c)=>r>=0&&r<8&&c>=0&&c<8;
+const sq=(r,c)=>String.fromCharCode(97+c)+(8-r);
+
+function draw(){
+ $('#board').empty();
+ for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+  $('#board').append(
+   $('<div>')
+    .addClass('square '+((r+c)%2?'dark':'light'))
+    .data({r,c})
+    .html(P[board[r][c]]||'')
+  );
+ }
+}
+
+function kingPos(col){
+ for(let r=0;r<8;r++)for(let c=0;c<8;c++)
+  if(board[r][c]===col+'k') return [r,c];
+}
+
+function attacked(r,c,col){
+ for(let i=0;i<8;i++)for(let j=0;j<8;j++){
+  let p=board[i][j];
+  if(p&&p[0]!==col)
+   if(getMoves(i,j,true).some(m=>m[0]===r&&m[1]===c)) return true;
+ }
+ return false;
+}
+
+function getMoves(r,c,raw=false){
+ let p=board[r][c]; if(!p) return [];
+ let col=p[0],t=p[1],m=[],d=col==='w'?-1:1;
+
+ if(t==='p'){
+  if(inB(r+d,c)&&!board[r+d][c]) m.push([r+d,c]);
+  if((r===6&&col==='w'||r===1&&col==='b')&&!board[r+d][c]&&!board[r+2*d][c])
+   m.push([r+2*d,c]);
+  for(let dc of[-1,1])
+   if(inB(r+d,c+dc)&&board[r+d][c+dc]&&board[r+d][c+dc][0]!==col)
+    m.push([r+d,c+dc]);
+  if(enPassant&&r+d===enPassant[0]&&Math.abs(c-enPassant[1])===1)
+   m.push(enPassant);
+ }
+
+ const L={
+  r:[[1,0],[-1,0],[0,1],[0,-1]],
+  b:[[1,1],[1,-1],[-1,1],[-1,-1]],
+  q:[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]
+ };
+
+ if(L[t]) for(let[dr,dc]of L[t]){
+  let nr=r+dr,nc=c+dc;
+  while(inB(nr,nc)){
+   if(!board[nr][nc]) m.push([nr,nc]);
+   else{ if(board[nr][nc][0]!==col) m.push([nr,nc]); break; }
+   nr+=dr; nc+=dc;
+  }
+ }
+
+ if(t==='n') for(let[dr,dc] of [[2,1],[2,-1],[-2,1],[-2,-1],[1,2],[1,-2],[-1,2],[-1,-2]]){
+  let nr=r+dr,nc=c+dc;
+  if(inB(nr,nc)&&(!board[nr][nc]||board[nr][nc][0]!==col))
+   m.push([nr,nc]);
+ }
+
+ if(t==='k'){
+  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+   if(!dr&&!dc)continue;
+   let nr=r+dr,nc=c+dc;
+   if(inB(nr,nc)&&(!board[nr][nc]||board[nr][nc][0]!==col))
+    m.push([nr,nc]);
+  }
+  if(!moved[col+'k']){
+   if(!moved[col+'r7']&&!board[r][5]&&!board[r][6]) m.push([r,6]);
+   if(!moved[col+'r0']&&!board[r][1]&&!board[r][2]&&!board[r][3]) m.push([r,2]);
+  }
+ }
+
+ if(raw) return m;
+
+ return m.filter(([nr,nc])=>{
+  let copy=clone(board);
+  copy[nr][nc]=copy[r][c]; copy[r][c]='';
+  let kp=(copy[nr][nc][1]==='k')?[nr,nc]:kingPos(col);
+  let save=board; board=copy;
+  let bad=attacked(kp[0],kp[1],col);
+  board=save;
+  return !bad;
+ });
+}
+
+function checkMate(){
+ for(let r=0;r<8;r++)for(let c=0;c<8;c++)
+  if(board[r][c]&&board[r][c][0]===turn)
+   if(getMoves(r,c).length) return false;
+ return attacked(...kingPos(turn),turn);
+}
+
+function staleMate(){
+ let kp=kingPos(turn);
+ if(kp&&attacked(kp[0],kp[1],turn)) return false;
+ for(let r=0;r<8;r++)for(let c=0;c<8;c++)
+  if(board[r][c]&&board[r][c][0]===turn)
+   if(getMoves(r,c).length) return false;
+ return true;
+}
+
+$('#board').on('click','.square',function(){
+ let r=$(this).data('r'),c=$(this).data('c');
+ $('.square').removeClass('selected move');
+
+ if(selected){
+  for(let[mr,mc] of legal){
+   if(mr===r&&mc===c){
+    history.push(clone(board));
+
+    if(board[selected.r][selected.c]==='wk') moved.wk=true;
+    if(board[selected.r][selected.c]==='bk') moved.bk=true;
+    if(board[selected.r][selected.c]==='wr'&&selected.c===0) moved.wr0=true;
+    if(board[selected.r][selected.c]==='wr'&&selected.c===7) moved.wr7=true;
+    if(board[selected.r][selected.c]==='br'&&selected.c===0) moved.br0=true;
+    if(board[selected.r][selected.c]==='br'&&selected.c===7) moved.br7=true;
+
+    if(board[selected.r][selected.c][1]==='p'&&Math.abs(r-selected.r)===2)
+     enPassant=[(r+selected.r)/2,c];
+    else enPassant=null;
+
+    if(board[selected.r][selected.c][1]==='p'&&!board[r][c]&&c!==selected.c)
+     board[selected.r][c]='';
+
+    if(board[selected.r][selected.c][1]==='k'&&Math.abs(c-selected.c)===2){
+     sCastle.play();
+     if(c===6){board[r][5]=board[r][7];board[r][7]='';}
+     else{board[r][3]=board[r][0];board[r][0]='';}
+    }
+
+    let cap=board[r][c]!=='';
+    board[r][c]=board[selected.r][selected.c];
+    board[selected.r][selected.c]='';
+
+    cap?sCap.play():sMove.play();
+
+    if(board[r][c][1]==='p'&&(r===0||r===7)){
+     promoPos=[r,c];
+     $('#promotion').show();
+     selected=null; draw(); return;
+    }
+
+    turn=turn==='w'?'b':'w';
+    $('#turn').text('Turn: '+(turn==='w'?'White':'Black'));
+
+    let notation=`${P[board[r][c]]} ${sq(selected.r,selected.c)}`;
+    notation+=cap?' × ':' → ';
+    notation+=sq(r,c);
+    if(board[r][c][1]==='k'&&Math.abs(c-selected.c)===2)
+     notation=(c===6?'O-O':'O-O-O');
+
+    $('#history').prepend(`<div>${notation}</div>`);
+
+    selected=null; draw();
+
+    if(checkMate()){sMate.play();alert('CHECKMATE!');return;}
+    if(staleMate()){sStale.play();alert('STALEMATE!');return;}
+    let kp=kingPos(turn);
+    if(kp&&attacked(kp[0],kp[1],turn)) sCheck.play();
+    return;
+   }
+  }
+  selected=null; draw(); return;
+ }
+
+ if(board[r][c]&&board[r][c][0]===turn){
+  selected={r,c}; legal=getMoves(r,c);
+  $(this).addClass('selected');
+  legal.forEach(([mr,mc])=>{
+   $('.square').filter((_,e)=>$(e).data('r')===mr&&$(e).data('c')===mc).addClass('move');
+  });
+ }
+});
+
+$('.promo').click(function(){
+ board[promoPos[0]][promoPos[1]]=turn+$(this).data('p');
+ $('#promotion').hide(); promoPos=null;
+ turn=turn==='w'?'b':'w';
+ draw();
+ if(checkMate()){sMate.play();alert('CHECKMATE!');}
+ else if(staleMate()){sStale.play();alert('STALEMATE!');}
+});
+
+$('#undo').click(()=>{
+ if(!history.length) return;
+ board=history.pop();
+ turn=turn==='w'?'b':'w';
+ draw();
+});
+
+draw();
+</script>
+</body>
+</html>

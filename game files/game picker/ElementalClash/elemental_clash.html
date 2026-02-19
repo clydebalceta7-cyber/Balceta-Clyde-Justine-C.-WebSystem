@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elemental Clash</title>
+    <link rel="stylesheet" href="elemental_clash.css">
+    <link rel="icon" href="img/controller.jpg">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Intro Cutscene Screen -->
+    <div id="startScreen" class="screen active">
+    <div class="cutscene-container">
+
+        <div class="cutscene-text fade-in">
+            <p>When the elements fell out of balance...</p>
+        </div>
+
+        <div class="cutscene-text fade-in-delay-1">
+            <p>The world began to tear itself apart.</p>
+        </div>
+
+        <div class="cutscene-text fade-in-delay-2">
+            <p>Fire raged. Seas rose. Skies shattered.</p>
+        </div>
+
+        <div class="cutscene-boss zoom-in">
+            <h1 class="glitch">ELEMENTAL CLASH</h1>
+            <p class="boss-subtitle">A world bound by four forces</p>
+
+            <div class="elemental-orbs">
+                <div class="orb water-orb">💧</div>
+                <div class="orb fire-orb">🔥</div>
+                <div class="orb air-orb">💨</div>
+                <div class="orb earth-orb">🌍</div>
+            </div>
+        </div>
+
+        <div class="cutscene-text" style="margin-top: 40px; opacity: 1;">
+            <p style="font-size:22px;">
+                Chosen by fate, you alone may restore balance.
+            </p>
+        </div>
+
+        <button class="button"
+            id="introContinue"
+            style="display:none; margin-top:50px;"
+            onclick="startGame()">
+            ⚔️ Begin Your Journey
+        </button>
+
+    </div>
+    </div>
+
+
+        <!-- Battle Screen -->
+        <div id="battleScreen" class="screen">
+            <h2 id="enemyName">Enemy Approaches</h2>
+            
+            <div class="health-bar">
+                <div class="health-label">Enemy HP</div>
+                <div class="health-bar-container">
+                    <div id="enemyHealthBar" class="health-bar-fill enemy-health-bar-fill">
+                        <span id="enemyHealthText">100/100</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="health-bar">
+                <div class="health-label">Your HP</div>
+                <div class="health-bar-container">
+                    <div id="playerHealthBar" class="health-bar-fill">
+                        <span id="playerHealthText">100/100</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="battle-log" id="battleLog"></div>
+
+            <div id="elementGuide" class="element-guide" style="display: none;">
+                <p><strong>Elemental Weaknesses:</strong></p>
+                <p>Water > Fire | Fire > Air | Air > Earth | Earth > Water</p>
+            </div>
+
+            <div class="element-buttons">
+                <button class="button element-btn water" onclick="playerAttack(0)">💧 Water</button>
+                <button class="button element-btn fire" onclick="playerAttack(2)">🔥 Fire</button>
+                <button class="button element-btn air" onclick="playerAttack(1)">💨 Air</button>
+                <button class="button element-btn earth" onclick="playerAttack(3)">🌍 Earth</button>
+            </div>
+        </div>
+
+        <!-- Chest Screen -->
+        <div id="chestScreen" class="screen">
+            <h2>🎁 You Found 3 Chests! 🎁</h2>
+            <div class="story-text">
+                <p>Choose wisely... one might be a Mimic!</p>
+            </div>
+            <div class="chest-buttons">
+                <button class="button" onclick="openChest(1)">Chest 1</button>
+                <button class="button" onclick="openChest(2)">Chest 2</button>
+                <button class="button" onclick="openChest(3)">Chest 3</button>
+            </div>
+        </div>
+
+        <!-- Scroll Screen -->
+        <div id="scrollScreen" class="screen">
+            <h2>📜 Ancient Scroll 📜</h2>
+            <div class="story-text">
+                <p id="scrollDiscoveryText"></p>
+                <p><strong>It reads:</strong></p>
+                <div class="scroll-content">
+                    <p>💧 Water > 🔥 Fire</p>
+                    <p>🔥 Fire > 💨 Air</p>
+                    <p>💨 Air > 🌍 Earth</p>
+                    <p>🌍 Earth > 💧 Water</p>
+                </div>
+            </div>
+            <button class="button" onclick="continueFromScroll()">Continue</button>
+        </div>
+
+        <!-- Boss Cutscene Screen -->
+        <div id="bossCutscene" class="screen">
+            <div class="cutscene-container">
+                <div class="cutscene-text fade-in" id="cutsceneText1">
+                    <p>You have defeated the Specter...</p>
+                </div>
+                <div class="cutscene-text fade-in-delay-1" id="cutsceneText2">
+                    <p>The ground begins to tremble...</p>
+                </div>
+                <div class="cutscene-text fade-in-delay-2" id="cutsceneText3">
+                    <p>Dark clouds swirl above you...</p>
+                </div>
+                <div class="cutscene-boss zoom-in" id="cutsceneBoss">
+                    <div class="boss-title">
+                        <h1 class="glitch" data-text="CONJUGATOR">CONJUGATOR</h1>
+                        <p class="boss-subtitle">Master of All Elements</p>
+                    </div>
+                    <div class="elemental-orbs">
+                        <div class="orb water-orb">💧</div>
+                        <div class="orb fire-orb">🔥</div>
+                        <div class="orb air-orb">💨</div>
+                        <div class="orb earth-orb">🌍</div>
+                    </div>
+                </div>
+                <button class="button" id="cutsceneContinue" style="display: none; margin-top: 40px;" onclick="startBossBattle()">Face Your Destiny</button>
+            </div>
+        </div>
+
+        <!-- Revival Cutscene Screen -->
+        <div id="revivalCutscene" class="screen">
+            <div class="cutscene-container">
+                <div class="cutscene-text fade-in" id="revivalText1">
+                    <p>Darkness consumes you...</p>
+                </div>
+                <div class="cutscene-text fade-in-delay-1" id="revivalText2">
+                    <p>But then... a brilliant light pierces through!</p>
+                </div>
+                <div class="cutscene-text fade-in-delay-2" id="revivalText3">
+                    <p>The four elemental spirits awaken within you!</p>
+                </div>
+                <div class="cutscene-boss zoom-in" id="revivalOrbs">
+                    <div class="elemental-orbs">
+                        <div class="orb water-orb">💧</div>
+                        <div class="orb fire-orb">🔥</div>
+                        <div class="orb air-orb">💨</div>
+                        <div class="orb earth-orb">🌍</div>
+                    </div>
+                    <div class="cutscene-text" style="margin-top: 30px; opacity: 1;">
+                        <p style="font-size: 24px; color: #ffeb3b;">Their combined power surges through your veins!</p>
+                        <p style="font-size: 20px; margin-top: 15px;">You have been restored to fight once more!</p>
+                    </div>
+                </div>
+                <button class="button" id="revivalContinue" style="display: none; margin-top: 40px;" onclick="continueAfterRevival()">Rise Again</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameOverScreen" class="screen">
+            <div class="game-over">
+                <h1 id="gameOverTitle"></h1>
+                <div id="gameOverMessage" class="story-text"></div>
+                <button class="button" onclick="location.reload()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory Cutscene Screen -->
+    <div id="victoryCutscene" class="screen">
+    <div class="cutscene-container">
+
+        <div class="cutscene-text fade-in" id="victoryText1">
+            <p>The Conjugator falls...</p>
+        </div>
+
+        <div class="cutscene-text fade-in-delay-1" id="victoryText2">
+            <p>The elements return to harmony.</p>
+        </div>
+
+        <div class="cutscene-text fade-in-delay-2" id="victoryText3">
+            <p>You have fulfilled the prophecy.</p>
+        </div>
+
+        <div class="cutscene-boss zoom-in" id="victoryOrbs">
+            <div class="elemental-orbs">
+                <div class="orb water-orb">💧</div>
+                <div class="orb fire-orb">🔥</div>
+                <div class="orb air-orb">💨</div>
+                <div class="orb earth-orb">🌍</div>
+            </div>
+
+            <div class="cutscene-text" style="margin-top: 30px; opacity: 1;">
+                <p style="font-size: 26px; color: #4caf50;">Balance has been restored.</p>
+                <p style="font-size: 20px; margin-top: 10px;">
+                    Enemies Defeated: <span id="victoryEnemyCount"></span>
+                </p>
+            </div>
+        </div>
+
+        <div style="margin-top: 50px; display: none;" id="victoryButtons">
+            <button class="button" onclick="location.reload()">🔄 Play Again</button>
+            <button class="button" onclick="exitGame(index.html)">🚪 Exit</button>
+        </div>
+
+    </div>
+    </div>
+
+    <script src="elemental_clash.js"></script>
+</body>
+</html>

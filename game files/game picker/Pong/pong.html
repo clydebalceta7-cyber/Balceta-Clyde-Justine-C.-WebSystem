@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pong</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+*{ box-sizing:border-box }
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+
+  font-family:Segoe UI, system-ui, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color:#e5e7eb;
+}
+
+h1{
+  margin-bottom:12px;
+}
+
+/* game container */
+#game{
+  width:420px;
+  height:240px;
+  position:relative;
+
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  border-radius:16px;
+  padding:8px;
+
+  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+}
+
+/* inner playfield */
+#field{
+  position:relative;
+  width:100%;
+  height:100%;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+/* paddles */
+.paddle{
+  position:absolute;
+  width:8px;
+  height:60px;
+  border-radius:6px;
+  background:#22c55e;
+  box-shadow: 0 0 12px rgba(34,197,94,0.6);
+}
+
+#left{ left:8px; top:80px; }
+#right{ right:8px; top:80px; }
+
+/* ball */
+#ball{
+  position:absolute;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ef4444;
+  box-shadow: 0 0 14px rgba(239,68,68,0.8);
+}
+
+/* center line */
+#field::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:0;
+  width:2px;
+  height:100%;
+  background:rgba(255,255,255,0.15);
+}
+
+#status{
+  margin-top:14px;
+  font-size:14px;
+  opacity:0.85;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Pong</h1>
+
+<div id="game">
+  <div id="field">
+    <div id="left" class="paddle"></div>
+    <div id="right" class="paddle"></div>
+    <div id="ball"></div>
+  </div>
+</div>
+
+<div id="status">W / S = Left paddle · ↑ / ↓ = Right paddle</div>
+
+<script>
+let ball = { x:200, y:110, dx:3, dy:3 };
+let leftY = 80;
+let rightY = 80;
+const paddleSpeed = 6;
+
+function update(){
+  /* move ball */
+  ball.x += ball.dx;
+  ball.y += ball.dy;
+
+  /* wall collision */
+  if(ball.y <= 0 || ball.y >= 230) ball.dy *= -1;
+
+  /* paddle collision */
+  if(ball.x <= 24 &&
+     ball.y >= leftY &&
+     ball.y <= leftY + 60){
+    ball.dx *= -1;
+  }
+
+  if(ball.x >= 386 &&
+     ball.y >= rightY &&
+     ball.y <= rightY + 60){
+    ball.dx *= -1;
+  }
+
+  /* reset if missed */
+  if(ball.x < 0 || ball.x > 420){
+    ball.x = 200;
+    ball.y = 110;
+    ball.dx *= -1;
+  }
+
+  /* render */
+  $('#ball').css({ left: ball.x, top: ball.y });
+  $('#left').css({ top: leftY });
+  $('#right').css({ top: rightY });
+}
+
+/* controls */
+$(document).keydown(e=>{
+  if(e.key === 'w' && leftY > 0) leftY -= paddleSpeed;
+  if(e.key === 's' && leftY < 180) leftY += paddleSpeed;
+
+  if(e.key === 'ArrowUp' && rightY > 0) rightY -= paddleSpeed;
+  if(e.key === 'ArrowDown' && rightY < 180) rightY += paddleSpeed;
+});
+
+/* game loop */
+setInterval(update, 20);
+</script>
+
+</body>
+</html>

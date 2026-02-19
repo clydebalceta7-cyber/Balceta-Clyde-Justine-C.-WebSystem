@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tic Tac Toe</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+*{
+  box-sizing: border-box;
+}
+
+body{
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: Segoe UI, system-ui, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: #e5e7eb;
+}
+
+/* Card container */
+.game{
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  text-align: center;
+}
+
+/* Title */
+h1{
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+/* Grid */
+.grid{
+  display: grid;
+  grid-template: repeat(3, 90px) / repeat(3, 90px);
+  gap: 12px;
+  margin: 0 auto 16px;
+}
+
+/* Cells */
+.cell{
+  background: rgba(255,255,255,0.12);
+  border-radius: 14px;
+  font-size: 42px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  user-select: none;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.2),
+    0 8px 18px rgba(0,0,0,0.45);
+
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.cell:hover{
+  background: rgba(255,255,255,0.18);
+  transform: translateY(-2px);
+}
+
+.cell:active{
+  transform: translateY(1px);
+}
+
+/* Status */
+#status{
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.cell.win{
+  background: rgba(56,189,248,0.35);
+  color: #e0f2fe;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.3),
+    0 12px 30px rgba(56,189,248,0.45);
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="game">
+  <h1>Tic Tac Toe</h1>
+  <div class="grid"></div>
+<p id="status">Turn: X</p>
+<button id="reset">Reset</button>
+</div>
+
+
+
+
+
+<script>
+let turn = "X";
+let board = Array(9).fill("");
+let gameOver = false;
+
+const wins = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
+];
+
+for(let i=0;i<9;i++){
+  $('.grid').append(`<div class="cell" data-i="${i}"></div>`);
+}
+
+$('.grid').on('click', '.cell', function(){
+  const i = $(this).data('i');
+  if(board[i] || gameOver) return;
+
+  board[i] = turn;
+  $(this).text(turn);
+
+  if(checkWin()){
+    $('#status').text(`${turn} wins`);
+    gameOver = true;
+    return;
+  }
+
+  if(board.every(c => c)){
+    $('#status').text(`Draw`);
+    gameOver = true;
+    return;
+  }
+
+  turn = turn === "X" ? "O" : "X";
+  $('#status').text(`Turn: ${turn}`);
+});
+
+function checkWin(){
+  for(const line of wins){
+    const [a,b,c] = line;
+    if(board[a] && board[a] === board[b] && board[a] === board[c]){
+      line.forEach(i=>{
+        $(`.cell[data-i=${i}]`).addClass('win');
+      });
+      return true;
+    }
+  }
+  return false;
+}
+
+/* Reset button */
+$('#reset').click(function(){
+  board.fill("");
+  turn = "X";
+  gameOver = false;
+  $('.cell').text('').removeClass('win');
+  $('#status').text('Turn: X');
+});
+
+</script>
+</body>
+</html>

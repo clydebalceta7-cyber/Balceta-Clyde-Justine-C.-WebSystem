@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Minesweeper</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<style>
+body{
+  background:#0f172a;
+  color:#e5e7eb;
+  font-family:Segoe UI,system-ui,sans-serif;
+  text-align:center;
+}
+
+.game-wrapper{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.controls{
+  margin:15px 0;
+  display:flex;
+  gap:12px;
+}
+
+select, button{
+  padding:8px 14px;
+  border:none;
+  border-radius:8px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.grid{
+  display:grid;
+  gap:4px;
+  margin:20px auto;
+  justify-content:center;
+}
+
+.cell{
+  width:50px;
+  height:50px;
+  background:#1e293b;
+  border-radius:6px;
+  line-height:50px;
+  font-size:22px;
+  cursor:pointer;
+  user-select:none;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.08);
+}
+
+.cell:hover{ background:#334155 }
+
+.cell.revealed{
+  background:#cbd5f5;
+  color:#020617;
+  cursor:default;
+  box-shadow:none;
+}
+
+.cell.mine{
+  background:#dc2626;
+  color:white;
+}
+
+.cell.flag{
+  background:#facc15;
+  color:#020617;
+}
+
+#status{
+  font-size:18px;
+  margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-wrapper">
+  <h1>Minesweeper</h1>
+
+  <div class="controls">
+    <select id="difficulty">
+      <option value="easy">Easy (5×5)</option>
+      <option value="medium">Medium (8×8)</option>
+      <option value="hard">Hard (10×10)</option>
+    </select>
+    <button id="restart">Restart</button>
+  </div>
+
+  <div class="grid"></div>
+  <div id="status"></div>
+</div>
+
+<script>
+let SIZE, TOTAL, mineCount;
+let mines = [];
+let gameOver = false;
+
+const configs = {
+  easy:   { size:5,  mines:5 },
+  medium: { size:8,  mines:12 },
+  hard:   { size:10, mines:20 }
+};
+
+function init(){
+  gameOver = false;
+  mines = [];
+  $('#status').text('');
+  $('.grid').empty();
+
+  const diff = $('#difficulty').val();
+  SIZE = configs[diff].size;
+  mineCount = configs[diff].mines;
+  TOTAL = SIZE * SIZE;
+
+  $('.grid').css('grid-template', `repeat(${SIZE},50px) / repeat(${SIZE},50px)`);
+
+  // create cells
+  for(let i=0;i<TOTAL;i++){
+    $('.grid').append(`<div class="cell" data-i="${i}"></div>`);
+  }
+
+  // randomize mines
+  while(mines.length < mineCount){
+    const r = Math.floor(Math.random()*TOTAL);
+    if(!mines.includes(r)) mines.push(r);
+  }
+}
+
+function countMines(i){
+  let r = Math.floor(i / SIZE);
+  let c = i % SIZE;
+  let count = 0;
+
+  for(let rr=r-1; rr<=r+1; rr++){
+    for(let cc=c-1; cc<=c+1; cc++){
+      if(rr<0||rr>=SIZE||cc<0||cc>=SIZE) continue;
+      if(mines.includes(rr*SIZE+cc)) count++;
+    }
+  }
+  return count;
+}
+
+function revealCell(i){
+  const cell = $(`.cell[data-i=${i}]`);
+  if(cell.hasClass('revealed') || cell.hasClass('flag')) return;
+
+  cell.addClass('revealed');
+
+  const count = countMines(i);
+  if(count > 0){
+    const colors={1:'#2563eb',2:'#16a34a',3:'#dc2626',4:'#7c3aed'};
+    cell.text(count).css('color',colors[count]||'#020617');
+    return;
+  }
+
+  let r=Math.floor(i/SIZE), c=i%SIZE;
+  for(let rr=r-1; rr<=r+1; rr++){
+    for(let cc=c-1; cc<=c+1; cc++){
+      if(rr<0||rr>=SIZE||cc<0||cc>=SIZE) continue;
+      revealCell(rr*SIZE+cc);
+    }
+  }
+}
+
+function revealAllMines(){
+  mines.forEach(i=>{
+    $(`.cell[data-i=${i}]`).addClass('mine revealed').text('💣');
+  });
+}
+
+function checkWin(){
+  return $('.cell.revealed').length === TOTAL - mineCount;
+}
+
+/* LEFT CLICK */
+$('.grid').on('click','.cell',function(){
+  if(gameOver) return;
+
+  const i = $(this).data('i');
+
+  if(mines.includes(i)){
+    revealAllMines();
+    $(this).addClass('mine revealed').text('💣');
+    $('#status').text('💥 Game Over');
+    gameOver = true;
+  }else{
+    revealCell(i);
+    if(checkWin()){
+      $('#status').text('🎉 You Win!');
+      gameOver = true;
+    }
+  }
+});
+
+/* RIGHT CLICK = FLAG */
+$('.grid').on('contextmenu','.cell',function(e){
+  e.preventDefault();
+  if(gameOver || $(this).hasClass('revealed')) return;
+  $(this).toggleClass('flag').text($(this).hasClass('flag')?'🚩':'');
+});
+
+/* CONTROLS */
+$('#restart').on('click', init);
+$('#difficulty').on('change', init);
+
+/* START GAME */
+init();
+</script>
+
+</body>
+</html>

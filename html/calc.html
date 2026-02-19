@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator</title>
+
+  <link rel="stylesheet" href="../css/calc.css">
+  <link rel="stylesheet" href="../css/style.css">
+
+  <link rel="icon" href="../img/calculator.png">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-left">
+    <img src="../img/pfp.jpg" alt="Calculator Icon" class="site-logo">
+    <h1 class="site-title">
+      Calculator <i class="fa-solid fa-calculator"></i>
+    </h1>
+  </div>
+  <hr>
+</header>
+
+<div class="container">
+
+  <nav class="sidebar">
+    <a href="home.html" class="navigation"><i class="fa-solid fa-house"></i> Home</a>
+    <a href="about.html" class="navigation"><i class="fa-solid fa-address-card"></i> About Us</a>
+    <a href="../game files/game picker/arcadenexus.html" class="navigation">
+      <i class="fa-solid fa-gamepad"></i> Arcade Nexus
+    </a>
+    <a href="calc.html" class="navigation"><i class="fa-solid fa-calculator"></i> Calculator</a>
+    <a href="login.html" class="navigation"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+    <a href="ClassAttendance.html" class="navigation">
+      <i class="fa-solid fa-clipboard-user"></i> Attendance
+    </a>
+  </nav>
+
+  <main class="content">
+    <hr>
+
+    <div class="calc-container">
+      <div id="display" class="calc-display">0</div>
+
+      <div class="keypad">
+        <button class="key clear" data-action="clear">C</button>
+        <button class="key op" data-op="/">÷</button>
+        <button class="key op" data-op="*">×</button>
+        <button class="key op" data-op="-">−</button>
+
+        <button class="key" data-num="7">7</button>
+        <button class="key" data-num="8">8</button>
+        <button class="key" data-num="9">9</button>
+        <button class="key op" data-op="+">+</button>
+
+        <button class="key" data-num="4">4</button>
+        <button class="key" data-num="5">5</button>
+        <button class="key" data-num="6">6</button>
+
+        <button class="key" data-num="1">1</button>
+        <button class="key" data-num="2">2</button>
+        <button class="key" data-num="3">3</button>
+
+        <button class="key" data-num="0">0</button>
+        <button class="key" data-num=".">.</button>
+        <button class="key equal" data-action="equals">=</button>
+      </div>
+    </div>
+
+    <hr>
+  </main>
+
+</div>
+
+<footer>
+  <a href="#"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+  <a href="#"><i class="fa-brands fa-instagram"></i> Instagram</a>
+  <a href="#"><i class="fa-brands fa-tiktok"></i> TikTok</a>
+  <a href="mailto:yourname@gmail.com"><i class="fa-solid fa-at"></i> Gmail</a>
+</footer>
+
+<div class="endtitle">
+  <h3>Thank you For Visiting!</h3>
+</div>
+
+<script>
+$(function(){
+  let current = '';
+  let operator = null;
+  let stored = null;
+
+  function updateDisplay(val){
+    const $d = $('#display');
+    $d.removeClass('glow');
+    void $d[0].offsetWidth;
+    $d.text(val).addClass('glow');
+  }
+
+  $('.key').on('click', function(){
+    const num = $(this).data('num');
+    const op  = $(this).data('op');
+    const act = $(this).data('action');
+
+    if(num !== undefined){
+      current += num;
+      updateDisplay(current);
+    }
+
+    if(op){
+      if(current === '') return;
+      stored = parseFloat(current);
+      operator = op;
+      current = '';
+    }
+
+    if(act === 'equals'){
+      if(stored === null || current === '') return;
+      let result;
+      const b = parseFloat(current);
+
+      switch(operator){
+        case '+': result = stored + b; break;
+        case '-': result = stored - b; break;
+        case '*': result = stored * b; break;
+        case '/': result = b !== 0 ? stored / b : '∞'; break;
+      }
+
+      updateDisplay(result);
+      current = result.toString();
+      stored = null;
+      operator = null;
+    }
+
+    if(act === 'clear'){
+      current = '';
+      stored = null;
+      operator = null;
+      updateDisplay('0');
+    }
+  });
+});
+</script>
+
+</body>
+</html>

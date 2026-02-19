@@ -1,0 +1,441 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a, #020617);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.game-container {
+    max-width: 800px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+h1, h2 {
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+.story-text {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.button {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    display: block;
+    margin: 10px auto;
+    min-width: 200px;
+}
+
+.button:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.45);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+}
+
+.health-bar {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.health-label {
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.health-bar-container {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    height: 30px;
+    overflow: hidden;
+    position: relative;
+}
+
+.health-bar-fill {
+    background: linear-gradient(90deg, #ff4444, #ff6b6b);
+    height: 100%;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.enemy-health-bar-fill {
+    background: linear-gradient(90deg, #9b59b6, #8e44ad);
+}
+
+.battle-info {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.element-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.element-btn {
+    padding: 20px;
+    font-size: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    border: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.element-btn:hover:not(:disabled) {
+    border-color: white;
+}
+
+.element-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.element-btn.water { background: rgba(0, 150, 255, 0.4); }
+.element-btn.fire { background: rgba(255, 69, 0, 0.4); }
+.element-btn.air { background: rgba(200, 200, 200, 0.4); }
+.element-btn.earth { background: rgba(139, 69, 19, 0.4); }
+
+.battle-log {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    color: white;
+    max-height: 200px;
+    overflow-y: auto;
+    margin: 20px 0;
+    font-size: 14px;
+}
+
+.battle-log p {
+    margin: 8px 0;
+    padding: 5px;
+    border-left: 3px solid rgba(255, 255, 255, 0.3);
+    padding-left: 10px;
+}
+
+.critical {
+    color: #ffeb3b;
+    font-weight: bold;
+}
+
+.damage {
+    color: #ff6b6b;
+}
+
+.heal {
+    color: #4caf50;
+}
+
+.chest-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.game-over {
+    text-align: center;
+    padding: 30px;
+}
+
+.victory {
+    color: #4caf50;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.defeat {
+    color: #ff4444;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.element-guide {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    color: white;
+    text-align: center;
+}
+
+.element-guide p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.scroll-content {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.scroll-content p {
+    margin: 10px 0;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Cutscene Styles */
+.cutscene-container {
+    position: relative;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.cutscene-text {
+    font-size: 28px;
+    color: white;
+    text-align: center;
+    margin: 20px 0;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+}
+
+.cutscene-text.reset {
+    opacity: 0;
+    animation: none;
+}
+
+.fade-in {
+    animation: fadeIn 2s ease-in forwards;
+}
+
+.fade-in-delay-1 {
+    animation: fadeIn 2s ease-in 2.5s forwards;
+}
+
+.fade-in-delay-2 {
+    animation: fadeIn 2s ease-in 5s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.cutscene-boss {
+    margin-top: 40px;
+    opacity: 0;
+}
+
+.zoom-in {
+    animation: zoomIn 2s ease-out 7.5s forwards, shake 0.5s ease-in-out 9.5s;
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0) scale(1); }
+    25% { transform: translateX(-10px) scale(1.05); }
+    75% { transform: translateX(10px) scale(1.05); }
+}
+
+.boss-title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.glitch {
+    font-size: 72px;
+    font-weight: bold;
+    color: white;
+    position: relative;
+    text-shadow: 
+        3px 3px 0px #ec2F4B,
+        -3px -3px 0px #009FFF,
+        0 0 20px rgba(255, 255, 255, 0.8);
+    animation: glitch 1s infinite;
+}
+
+@keyframes glitch {
+    0%, 90%, 100% {
+        text-shadow: 
+            3px 3px 0px #ec2F4B,
+            -3px -3px 0px #009FFF,
+            0 0 20px rgba(255, 255, 255, 0.8);
+    }
+    45% {
+        text-shadow: 
+            -3px 3px 0px #ec2F4B,
+            3px -3px 0px #009FFF,
+            0 0 20px rgba(255, 255, 255, 0.8);
+    }
+}
+
+.boss-subtitle {
+    font-size: 24px;
+    color: #ffeb3b;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    margin-top: 10px;
+}
+
+.elemental-orbs {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.orb {
+    font-size: 60px;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+}
+
+.water-orb {
+    animation-delay: 0s;
+}
+
+.fire-orb {
+    animation-delay: 0.75s;
+}
+
+.air-orb {
+    animation-delay: 1.5s;
+}
+
+.earth-orb {
+    animation-delay: 2.25s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) scale(1);
+    }
+    50% {
+        transform: translateY(-20px) scale(1.1);
+    }
+}
+
+#startScreen .cutscene-container {
+    background: radial-gradient(circle at top, rgba(255,255,255,0.15), rgba(0,0,0,0.6));
+}
+
+#startScreen .glitch {
+    font-size: 80px;
+    letter-spacing: 4px;
+}
+
+#startScreen .boss-subtitle {
+    font-size: 22px;
+    margin-top: 15px;
+    color: #ffeb3b;
+}
+
+#startScreen .cutscene-boss {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.game-section{
+  margin-top: 80px;
+}
+
+.section-title{
+  font-size: 28px;
+  margin-bottom: 24px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* compact grid */
+.game-grid.compact{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+/* smaller cards */
+.game-grid.compact .game-card{
+  padding: 24px;
+  font-size: 16px;
+  border-radius: 14px;
+  transform: translateY(40px) scale(0.97);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+/* when section reveals */
+.game-section.show .game-card{
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}

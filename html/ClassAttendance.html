@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/attendance.css">
+  <link rel="icon" href="../img/attendance.png">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+
+  <title>Class Attendance</title>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="header-left">
+    <img src="../img/pfp.jpg" alt="Attendance Icon" class="site-logo">
+    <h1 class="site-title">
+      Class Attendance <i class="fa-solid fa-clipboard-user"></i>
+    </h1>
+  </div>
+  <hr>
+</header>
+
+<div class="container">
+
+  <nav class="sidebar">
+    <a href="home.html" class="navigation"><i class="fa-solid fa-house"></i> Home</a>
+    <a href="about.html" class="navigation"><i class="fa-solid fa-address-card"></i> About Us</a>
+    <a href="../game files/game picker/arcadenexus.html" class="navigation">
+      <i class="fa-solid fa-gamepad"></i> Arcade Nexus
+    </a>
+    <a href="calc.html" class="navigation"><i class="fa-solid fa-calculator"></i> Calculator</a>
+    <a href="login.html" class="navigation"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+    <a href="ClassAttendance.html" class="navigation">
+      <i class="fa-solid fa-clipboard-user"></i> Attendance
+    </a>
+  </nav>
+
+  <main class="content">
+    <hr>
+
+    <div class="attendance-header">
+      <img src="../img/attendance.png" alt="Attendance Icon" class="attendance-icon">
+      <h2>Class Attendance</h2>
+    </div>
+
+    <div class="attendance-wrapper">
+
+      <div class="attendance-form">
+        <label>First Name *</label>
+        <input type="text" id="firstName">
+
+        <label>Middle Initial</label>
+        <input type="text" id="middleInitial" maxlength="1">
+
+        <label>Last Name *</label>
+        <input type="text" id="lastName">
+
+        <label>Age *</label>
+        <input type="number" id="age" min="1">
+
+        <label>Email *</label>
+        <input type="email" id="EmailCA">
+
+        <button id="addStudent">Add</button>
+      </div>
+
+      <div class="attendance-list">
+        <h3>Attendance List</h3>
+        <ol id="list"></ol>
+      </div>
+
+    </div>
+
+    <hr>
+  </main>
+
+</div>
+
+<footer>
+  <a href="#"><i class="fa-brands fa-facebook-f"></i> Facebook</a>
+  <a href="#"><i class="fa-brands fa-instagram"></i> Instagram</a>
+  <a href="#"><i class="fa-brands fa-tiktok"></i> TikTok</a>
+  <a href="mailto:yourname@gmail.com"><i class="fa-solid fa-at"></i> Gmail</a>
+</footer>
+
+<div class="endtitle">
+  <h3>Thank you For Visiting!</h3>
+</div>
+
+<script src="../js/ClassAttendance.js"></script>
+</body>
+</html>
