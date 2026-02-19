@@ -257,5 +257,43 @@ color: #bfdbfe;
     animation-duration: 0.7s;
 }
 
+@media (max-width: 1024px) {
+
+  /* make layout vertical */
+  .container,
+  .main-container,
+  .content {
+    flex-direction: column;
+  }
+
+  /* sidebar becomes top bar */
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .sidebar button,
+  .sidebar a {
+    width: auto;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  /* content full width */
+  .main-content {
+    width: 100%;
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
 
 
